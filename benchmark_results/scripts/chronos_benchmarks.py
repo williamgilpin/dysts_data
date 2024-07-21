@@ -34,7 +34,6 @@ import os
 if not os.path.exists(dirname):
     os.makedirs(dirname)
 
-
 if training_length > context_length:
     warnings.warn("Training length has been increased to be greater than context length")
     training_length = context_length + 1
@@ -47,11 +46,10 @@ integrator_args = {
     "rtol": 1e-12,
 }
 ## Pick num_ic random initial conditions
-ic_traj = eq.make_trajectory(1000, pts_per_period=10)
+ic_traj = eq.make_trajectory(1000, pts_per_period=10, atol=1e-12, rtol=1e-12)
 np.random.seed(0)
 sel_inds = np.random.choice(range(1000), size=num_ic, replace=False).astype(int)
 ic_context_test = ic_traj[sel_inds, :]
-print("t ", ic_context_test[0], flush=True)
 traj_test = list()
 for ic in ic_context_test:
     eq.ic = np.copy(ic)
@@ -99,5 +97,3 @@ for model_size in ["tiny", "mini", "small", "base", "large"]:
     save_str = f"forecast_{eq.name}_{model.name}"
     save_str = os.path.join(dirname, save_str)
     np.save(save_str, all_traj_forecasts, allow_pickle=True)
-
-
