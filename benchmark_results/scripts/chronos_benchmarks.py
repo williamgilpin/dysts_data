@@ -25,7 +25,8 @@ num_ic = 20
 training_length = 1000
 context_length = 512
 forecast_length = 400 # Maximum for these models
-n_average = 20
+# n_average = 20
+n_average = 1
 pts_per_period = 40
 
 dirname = f"chronos_benchmarks_context_{context_length}_granularity_{pts_per_period}"
@@ -34,7 +35,7 @@ import os
 if not os.path.exists(dirname):
     os.makedirs(dirname)
 
-if training_length > context_length:
+if training_length < context_length:
     warnings.warn("Training length has been increased to be greater than context length")
     training_length = context_length + 1
 
@@ -66,29 +67,18 @@ save_str_reference = f"forecast_{eq.name}_true_chronos"
 save_str_reference = os.path.join(dirname, save_str_reference)
 np.save(save_str_reference, traj_test_forecast, allow_pickle=True)
 
-
-import torch
-has_gpu = torch.cuda.is_available()
-print("has gpu: ", torch.cuda.is_available(), flush=True)
-n = torch.cuda.device_count()
-print(f"{n} devices found.", flush=True)
-if has_gpu:
-    device = "cuda"
-else:
-    device = "cpu"
-
 from models import ChronosModel
 
 ## Run chronos zero-shot benchmark
 for model_size in ["tiny", "mini", "small", "base", "large"]:
     model = ChronosModel(model=model_size, context=context_length, n_samples=n_average, 
-                                        prediction_length=forecast_length, device=device)
+                                        prediction_length=forecast_length)
     print(model_size, flush=True)
     all_traj_forecasts = list()
     ## Loop over the replicate trajectories
     for itr, traj in enumerate(traj_test_context):
         print(itr, flush=True)
-        forecast_multivariate = np.array(model.predict(traj.T)).squeeze()
+        forecast_multivariate = np.array(model.predict(traj.T))#.squeeze()
         all_traj_forecasts.append(forecast_multivariate.copy())
 
     all_traj_forecasts = np.array(all_traj_forecasts)

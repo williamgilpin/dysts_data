@@ -12,21 +12,34 @@ class ChronosModel:
         context (int): The number of data points to use for context when making predictions.
         n_samples (int): The number of samples to use when making predictions.
         prediction_length (int): The number of data points to predict.
-        device (str): The device to use for predictions. One of "cpu", "cuda", or "mps" 
-            for Apple Silicon.
+        use_gpu (bool): Whether to use a GPU for prediction.
         max_chunk (int): The maximum number of data points to predict in one go. If the 
             prediction length is greater than this value, we use the autoregressive
             mode to predict the future values.
+        device (str): Deprecated. The device to use for prediction
     """
 
     def __init__(self, model="base", context=100, n_samples=20, prediction_length=64, 
-                 device="cpu", max_chunk=64):
+                 use_gpu=True, max_chunk=64, device=None):
         self.model = model
         self.context = context
         self.n_samples = n_samples
         self.prediction_length = prediction_length
-        self.device = device
+        self.use_gpu = use_gpu
         self.max_chunk = max_chunk
+
+        ## If a GPU is available, use it
+        if self.use_gpu:
+            has_gpu = torch.cuda.is_available()
+            print("has gpu: ", torch.cuda.is_available(), flush=True)
+            n = torch.cuda.device_count()
+            print(f"{n} devices found.", flush=True)
+            if has_gpu:
+                self.device = "cuda"
+            else:
+                self.device = "cpu"
+        else:
+            self.device = "cpu"
 
         # If the prediction length is greater than 64, we need to use the autoregressive
         # mode  to predict the future values.
@@ -51,29 +64,19 @@ class ChronosModel:
                 the number of dimensions.
                 
         """
-        
-        # print(data.shape, flush=True)
-        forecast_multivariate = list()
-        # d = data.shape[0]
-        # for _ in range(d):
         if self.autoregressive:
             forecast_agg = []
             current_context = torch.tensor(data[-self.context:])
             print(int(math.ceil(self.prediction_length / self.max_chunk)), flush=True)
             for i in range(int(math.ceil(self.prediction_length / self.max_chunk))):
-                # print(i)
                 forecast = self.pipeline.predict(
                     context=torch.tensor(current_context),
                     prediction_length=self.max_chunk,
                     num_samples=self.n_samples,
                 )
                 mean_forecast = forecast.mean(dim=1)
-                # print(forecast.shape, current_context.shape, mean_forecast.shape, flush=True)
-                
                 current_context = torch.cat((current_context, mean_forecast), dim=1)[:, -self.context:]
-                # print(current_context.shape)
-                forecast_agg.append(forecast.squeeze())
-            print(forecast_agg[0].shape, flush=True)
+                forecast_agg.append(forecast)
             forecast = torch.cat(forecast_agg, dim=2)[:self.prediction_length]
         else:
             forecast = self.pipeline.predict(
@@ -81,7 +84,11 @@ class ChronosModel:
                 prediction_length=self.prediction_length,
                 num_samples=self.n_samples,
             )
-            # forecast_multivariate.append(forecast)
+        # forecast = self.pipeline.predict(
+        #     context=torch.tensor(data[-self.context:]),
+        #     prediction_length=self.prediction_length,
+        #     num_samples=self.n_samples,
+        #     limit_prediction_length = False,
+        # )
         return forecast
-        
-        return forecast_multivariate
+
