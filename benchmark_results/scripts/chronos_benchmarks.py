@@ -21,7 +21,7 @@ print(equation_name, flush=True)
 # forecast_length = 64 # Maximum for these models
 # n_average = 20
 
-num_ic = 20
+num_ic = 20*2
 training_length = 1000
 context_length = 512
 forecast_length = 400 # Maximum for these models
@@ -78,7 +78,7 @@ for model_size in ["tiny", "mini", "small", "base", "large"]:
     ## Loop over the replicate trajectories
     for itr, traj in enumerate(traj_test_context):
         print(itr, flush=True)
-        forecast_multivariate = np.array(model.predict(traj.T))#.squeeze()
+        forecast_multivariate = np.array(model.predict(traj.T))
         all_traj_forecasts.append(forecast_multivariate.copy())
 
     all_traj_forecasts = np.array(all_traj_forecasts)
