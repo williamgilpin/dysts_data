@@ -48,7 +48,7 @@ class ChronosModel:
         self.pipeline = ChronosPipeline.from_pretrained(
             f"amazon/chronos-t5-{self.model}",
             device_map=self.device,
-            # torch_dtype=torch.bfloat16,
+            torch_dtype=torch.bfloat16,
         )
 
         self.name = f"chronos-{self.model}-context{self.context}"
