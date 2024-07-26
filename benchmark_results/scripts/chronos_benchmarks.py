@@ -28,6 +28,7 @@ forecast_length = 400 # Maximum for these models
 # n_average = 20
 n_average = 1
 pts_per_period = 40
+pts_per_period = 25
 
 dirname = f"chronos_benchmarks_context_{context_length}_granularity_{pts_per_period}"
 ## Check if the directory exists, if not, create it

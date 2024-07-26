@@ -23,8 +23,9 @@ context_length = 512
 forecast_length = 300 # Maximum for these models
 # n_average = 20
 n_average = 1
-pts_per_period = 40
+# pts_per_period = 40
 # pts_per_period = 30
+pts_per_period = 25
 
 dirname = f"darts_benchmarks_context_{context_length}_granularity_{pts_per_period}"
 ## Check if the directory exists, if not, create it
@@ -99,7 +100,7 @@ pl_trainer_kwargs = [gpu_params]
 model_static_dict = {"pl_trainer_kwargs" : pl_trainer_kwargs}
 
 
-def import_model_by_name(model_name):
+def import_model_by_name(model_name, *args):
     if model_name == "NBEATS":
         from darts.models.forecasting.nbeats import NBEATSModel
         return NBEATSModel
@@ -115,9 +116,10 @@ def import_model_by_name(model_name):
     elif model_name == "Linear":
         from darts.models.forecasting.linear_regression_model import LinearRegressionModel
         return LinearRegressionModel
-    elif model_name == "NVAR":
-        from esn import NVARForecast
-        return NVARForecast
+    # elif model_name == "NVAR":
+    #     from esn import NVARForecast
+    #     nvar_curry = lambda x: NVARForecast(x, delay=context_length)
+    #     return NVARForecast
     else:
         raise ValueError(f"Unknown model name: {model_name}")
         
@@ -200,189 +202,73 @@ def cross_validate_hyperparameters(model_name, traj_train, hyperparams, hyperpar
         all_scores.append((mean_score, hyperparams_combination))
     
     best_score, best_params = min(all_scores, key=lambda x: x[0])
+    best_params.update(hyperparams)
     print(f"Best hyperparameters: {best_params} with score: {best_score}", flush=True)
     
     return best_params
     
+
+model_name = "Transformer"
+print(model_name, flush=True)
 context_length = 100
-print("Transformer", flush=True)
-all_hyperparameters = {"input_chunk_length": context_length, "output_chunk_length": 1}
-# hcandidate = {"input_chunk_length": [5, 25, 50, 75, 100], , "output_chunk_length": 1}
+hyperparameters = {"input_chunk_length": context_length, "output_chunk_length": 1}
+hyperparameter_candidates = {"input_chunk_length": [5, 25, 50, 75, 100]}
+hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates)
 run_forecast_benchmark(
-    "Transformer", traj_train, all_hyperparameters, context_length, 
+    model_name, traj_train, hyperparameters, context_length, 
     forecast_length, gpu_params, equation_name, dirname=dirname
 )
 
-print("NBEATS", flush=True)
-all_hyperparameters = {"input_chunk_length": context_length, "output_chunk_length": 1}
+model_name = "NBEATS"
+print(model_name, flush=True)
+context_length = 100
+hyperparameters = {"input_chunk_length": context_length, "output_chunk_length": 1}
+hyperparameter_candidates = {"input_chunk_length": [5, 25, 50, 75, 100]}
+hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates)
 run_forecast_benchmark(
-    "NBEATS", traj_train, all_hyperparameters, context_length, 
+    model_name, traj_train, hyperparameters, context_length, 
     forecast_length, gpu_params, equation_name, dirname=dirname
 )
 
-print("LSTM", flush=True)
-all_hyperparameters = {"input_chunk_length": context_length, "model": "LSTM", "training_length": context_length + 1}
+model_name = "LSTM"
+print(model_name, flush=True)
+context_length = 100
+hyperparameters = {"input_chunk_length": context_length, "output_chunk_length": 1}
+hyperparameter_candidates = {"input_chunk_length": [5, 25, 50, 75, 100]}
+hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates)
 run_forecast_benchmark(
-    "LSTM", traj_train, all_hyperparameters, context_length, 
+    model_name, traj_train, hyperparameters, context_length, 
     forecast_length, gpu_params, equation_name, dirname=dirname
 )
 
-print("TiDE", flush=True)
-all_hyperparameters = {"input_chunk_length": context_length, "model": "LSTM", "training_length": context_length + 1}
+model_name = "TiDE"
+print(model_name, flush=True)
+context_length = 100
+hyperparameters = {"input_chunk_length": context_length, "output_chunk_length": 1}
+hyperparameter_candidates = {"input_chunk_length": [5, 25, 50, 75, 100]}
+hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates)
 run_forecast_benchmark(
-    "TiDE", traj_train, all_hyperparameters, context_length, 
+    model_name, traj_train, hyperparameters, context_length, 
     forecast_length, gpu_params, equation_name, dirname=dirname
 )
 
-print("Linear", flush=True)
-all_hyperparameters = {"lags": context_length}
+
+model_name = "Linear"
+print(model_name, flush=True)
+context_length = 100
+hyperparameters = {"lags": context_length}
+hyperparameter_candidates = {"lags": [5, 25, 50, 75, 100]}
+hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates)
 run_forecast_benchmark(
-    "Linear", traj_train, all_hyperparameters, context_length, 
+    model_name, traj_train, hyperparameters, context_length, 
     forecast_length, gpu_params, equation_name, dirname=dirname
 )
-
-# from darts.models.forecasting.transformer_model import TransformerModel
-# print("Transformer", flush=True)
-# all_hyperparameters = {"input_chunk_length": context_length, "output_chunk_length": 1}
-# all_pred = list()
-# for i in range(len(traj_test_context)):
-#     print(i, flush=True)
-#     train_data = np.copy(traj_train)[i]
-#     y_train_ts = TimeSeries.from_values(train_data)
-#     try:
-#         pc = dict()
-#         pc.update(all_hyperparameters)
-#         pc.update({"pl_trainer_kwargs": gpu_params})
-#         model = TransformerModel(**pc)
-#     except:
-#         model = TransformerModel(**all_hyperparameters)
-    
-#     ## Fit the forecasting model on the given data
-#     model.fit(y_train_ts)
-    
-#     ## Attempt to predict the validation data. If it fails, then the model returns
-#     ## a None value for the prediction.
-#     try:
-#         y_val_pred = model.predict(forecast_length).values().squeeze()
-#     except:
-#         print(f"Failed to predict {equation_name} {model_name}", flush=True)
-#         y_val_pred = np.array([None] * forecast_length)
-#     y_val_pred = np.array(y_val_pred.tolist())
-#     all_pred.append(np.copy(y_val_pred))
-# all_pred = np.array(all_pred)
-# save_str = f"forecast_{eq.name}_Transformer"
-# save_str = os.path.join(dirname, save_str)
-# np.save(save_str, all_pred, allow_pickle=True)
-
-
-# from darts.models.forecasting.nbeats import NBEATSModel
-# print("NBEATS", flush=True)
-# all_hyperparameters = {"input_chunk_length": context_length, "output_chunk_length": 1}
-# all_pred = list()
-# for i in range(len(traj_test_context)):
-#     print(i, flush=True)
-#     train_data = np.copy(traj_train)[i]
-#     y_train_ts = TimeSeries.from_values(train_data)
-#     try:
-#         pc = dict()
-#         pc.update(all_hyperparameters)
-#         pc.update({"pl_trainer_kwargs": gpu_params})
-#         model = NBEATSModel(**pc)
-#     except:
-#         model = NBEATSModel(**all_hyperparameters)
-    
-#     ## Fit the forecasting model on the given data
-#     model.fit(y_train_ts)
-    
-#     ## Attempt to predict the validation data. If it fails, then the model returns
-#     ## a None value for the prediction.
-#     try:
-#         y_val_pred = model.predict(forecast_length).values().squeeze()
-#     except:
-#         print(f"Failed to predict {equation_name} {model_name}", flush=True)
-#         y_val_pred = np.array([None] * forecast_length)
-#     y_val_pred = np.array(y_val_pred.tolist())
-#     all_pred.append(np.copy(y_val_pred))
-# all_pred = np.array(all_pred)
-# save_str = f"forecast_{eq.name}_NBEATS"
-# save_str = os.path.join(dirname, save_str)
-# np.save(save_str, all_pred, allow_pickle=True)
-
-
-# from darts.models.forecasting.rnn_model import RNNModel
-# print("LSTM", flush=True)
-# # all_hyperparameters = {"input_chunk_length": context_length, "model": "LSTM", "training_length": training_length - 1}
-# # all_hyperparameters = {"input_chunk_length": int(0.1 * context_length), "model": "LSTM", "training_length": context_length}
-# all_hyperparameters = {"input_chunk_length": context_length, "model": "LSTM", "training_length": context_length + 1}
-# all_pred = list()
-# for i in range(len(traj_test_context)):
-#     print(i, flush=True)
-#     train_data = np.copy(traj_train)[i]
-#     y_train_ts = TimeSeries.from_values(train_data)
-#     try:
-#         pc = dict()
-#         pc.update(all_hyperparameters)
-#         pc.update({"pl_trainer_kwargs": gpu_params})
-#         model = RNNModel(**pc)
-#     except:
-#         model = RNNModel(**all_hyperparameters)
-    
-#     ## Fit the forecasting model on the given data
-#     model.fit(y_train_ts)
-    
-#     ## Attempt to predict the validation data. If it fails, then the model returns
-#     ## a None value for the prediction.
-#     try:
-#         y_val_pred = model.predict(forecast_length).values().squeeze()
-#     except:
-#         print(f"Failed to predict {equation_name} {model_name}", flush=True)
-#         y_val_pred = np.array([None] * forecast_length)
-#     y_val_pred = np.array(y_val_pred.tolist())
-#     all_pred.append(np.copy(y_val_pred))
-# all_pred = np.array(all_pred)
-# save_str = f"forecast_{eq.name}_LSTM"
-# save_str = os.path.join(dirname, save_str)
-# np.save(save_str, all_pred, allow_pickle=True)
-
-
-# from darts.models.forecasting.tide_model import TiDEModel
-# print("TiDE", flush=True)
-# all_hyperparameters = {"input_chunk_length": context_length, "output_chunk_length": 1}
-# all_pred = list()
-# for i in range(len(traj_test_context)):
-#     print(i, flush=True)
-#     train_data = np.copy(traj_train)[i]
-#     y_train_ts = TimeSeries.from_values(train_data)
-#     try:
-#         pc = dict()
-#         pc.update(all_hyperparameters)
-#         pc.update({"pl_trainer_kwargs": gpu_params})
-#         model = TiDEModel(**pc)
-#     except:
-#         model = TiDEModel(**all_hyperparameters)
-    
-#     ## Fit the forecasting model on the given data
-#     model.fit(y_train_ts)
-    
-#     ## Attempt to predict the validation data. If it fails, then the model returns
-#     ## a None value for the prediction.
-#     try:
-#         y_val_pred = model.predict(forecast_length).values().squeeze()
-#     except:
-#         print(f"Failed to predict {equation_name} {model_name}", flush=True)
-#         y_val_pred = np.array([None] * forecast_length)
-#     y_val_pred = np.array(y_val_pred.tolist())
-#     all_pred.append(np.copy(y_val_pred))
-# all_pred = np.array(all_pred)
-# save_str = f"forecast_{eq.name}_TiDE"
-# save_str = os.path.join(dirname, save_str)
-# np.save(save_str, all_pred, allow_pickle=True)
-
-
 
 from esn import NVARForecast
 print("NVAR", flush=True)
-# all_hyperparameters = {"delay": context_length}
+# hyperparameters = {"delay": context_length}
+hyperparameters = {"delay": 100}
+hyperparameter_candidates = {"delay": [5, 25, 50, 75, 100]}
 all_pred = list()
 for i in range(len(traj_test_context)):
     print(i, flush=True)
@@ -399,37 +285,4 @@ all_pred = np.array(all_pred)
 save_str = f"forecast_{eq.name}_NVAR"
 save_str = os.path.join(dirname, save_str)
 np.save(save_str, all_pred, allow_pickle=True)
-
-
-
-
-# from darts.models.forecasting.linear_regression_model import LinearRegressionModel
-# print("Linear", flush=True)
-# all_hyperparameters = {"lags": context_length}
-# all_pred = list()
-# for i in range(len(traj_test_context)):
-#     print(i, flush=True)
-#     train_data = np.copy(traj_train)[i]
-#     y_train_ts = TimeSeries.from_values(train_data)
-#     model = LinearRegressionModel(**all_hyperparameters)
-    
-#     ## Fit the forecasting model on the given data
-#     model.fit(y_train_ts)
-    
-#     ## Attempt to predict the validation data. If it fails, then the model returns
-#     ## a None value for the prediction.
-#     try:
-#         y_val_pred = model.predict(forecast_length).values().squeeze()
-#     except:
-#         print(f"Failed to predict {equation_name} {model_name}", flush=True)
-#         y_val_pred = np.array([None] * forecast_length)
-#     y_val_pred = np.array(y_val_pred.tolist())
-#     all_pred.append(np.copy(y_val_pred))
-# all_pred = np.array(all_pred)
-# save_str = f"forecast_{eq.name}_Linear"
-# save_str = os.path.join(dirname, save_str)
-# np.save(save_str, all_pred, allow_pickle=True)
-
-
-
 
