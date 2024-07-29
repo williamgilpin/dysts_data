@@ -8,11 +8,13 @@ import argparse
 # Function to process command-line arguments
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Process a command-line argument.')
-    parser.add_argument('arg1', type=str, help='A string argument')
+    parser.add_argument('arg1', type=str, help='The name of the system to be processed')
+    parser.add_argument('arg2', type=int, nargs='?', default=30, help='An optional integer argument for pts_per_period')
     args = parser.parse_args()
     return args
 args = parse_arguments()
 equation_name = args.arg1
+pts_per_period = args.arg2
 print(equation_name, flush=True)
 
 # num_ic = 20
@@ -21,14 +23,16 @@ print(equation_name, flush=True)
 # forecast_length = 64 # Maximum for these models
 # n_average = 20
 
-num_ic = 20*2
-training_length = 1000
+num_ic = 20
+training_length = 512
 context_length = 512
-forecast_length = 400 # Maximum for these models
+forecast_length = 300 # Maximum for these models
+# forecast_length = 500 # Maximum for these models
 # n_average = 20
 n_average = 1
-pts_per_period = 40
-pts_per_period = 25
+# pts_per_period = 40
+# pts_per_period = 25
+# pts_per_period = 30
 
 dirname = f"chronos_benchmarks_context_{context_length}_granularity_{pts_per_period}"
 ## Check if the directory exists, if not, create it
