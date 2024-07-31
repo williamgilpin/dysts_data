@@ -9,12 +9,12 @@ import argparse
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Process a command-line argument.')
     parser.add_argument('arg1', type=str, help='The name of the system to be processed')
-    parser.add_argument('arg2', type=int, nargs='?', default=30, help='An optional integer argument for pts_per_period')
+    parser.add_argument('arg2', type=str, nargs='?', default='30', help='An optional integer argument for pts_per_period')
     args = parser.parse_args()
     return args
 args = parse_arguments()
 equation_name = args.arg1
-pts_per_period = args.arg2
+pts_per_period = int(args.arg2)
 print(equation_name, flush=True)
 
 # num_ic = 20
