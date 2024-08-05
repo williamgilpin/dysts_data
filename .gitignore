@@ -16,6 +16,10 @@ large_multivariate__pts_per_period_100__periods_100.json
 *__periods_100*
 all_outputs.json*
 
+# Old files
+archive/
+OLD*
+
 # C extensions
 *.so
 
