@@ -230,27 +230,17 @@ def cross_validate_hyperparameters(model_name, traj_train, hyperparams, hyperpar
 model_name = "NVAR"
 print(model_name, flush=True)
 hyperparameters = {}
-hyperparameter_candidates = {"delay": [5, 25, 50, 75, 100]}
+hyperparameter_candidates = {"delay": [2, 5, 10, 15, 25]}
 hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates, gpu_params)
 run_forecast_benchmark(
     model_name, traj_train, hyperparameters,
     forecast_length, gpu_params, equation_name, dirname=dirname
 )
 
-model_name = "LSTM"
+model_name = "NBEATS"
 print(model_name, flush=True)
-hyperparameters = {}
-hyperparameter_candidates = {"input_chunk_length": [1, 10, 25], "training_length": [51, 101, 256]}
-hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates, gpu_params)
-run_forecast_benchmark(
-    model_name, traj_train, hyperparameters,
-    forecast_length, gpu_params, equation_name, dirname=dirname
-)
-
-model_name = "Linear"
-print(model_name, flush=True)
-hyperparameters = {}
-hyperparameter_candidates = {"lags": [5, 25, 50, 75, 100]}
+hyperparameters = {"output_chunk_length": 1}
+hyperparameter_candidates = {"input_chunk_length": [5, 25, 50, 75, 100]}
 hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates, gpu_params)
 run_forecast_benchmark(
     model_name, traj_train, hyperparameters, 
@@ -270,20 +260,30 @@ run_forecast_benchmark(
 model_name = "Transformer"
 print(model_name, flush=True)
 hyperparameters = {"output_chunk_length": 1}
-hyperparameter_candidates = {"input_chunk_length": [5, 25, 50, 75, 100][::-1]}
+hyperparameter_candidates = {"input_chunk_length": [5, 25, 50, 75, 100]}
 hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates, gpu_params)
 run_forecast_benchmark(
     model_name, traj_train, hyperparameters, 
     forecast_length, gpu_params, equation_name, dirname=dirname
 )
 
-model_name = "NBEATS"
+model_name = "Linear"
 print(model_name, flush=True)
-hyperparameters = {"output_chunk_length": 1}
-hyperparameter_candidates = {"input_chunk_length": [5, 25, 50, 75, 100]}
+hyperparameters = {}
+hyperparameter_candidates = {"lags": [5, 25, 50, 75, 100]}
 hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates, gpu_params)
 run_forecast_benchmark(
     model_name, traj_train, hyperparameters, 
+    forecast_length, gpu_params, equation_name, dirname=dirname
+)
+
+model_name = "LSTM"
+print(model_name, flush=True)
+hyperparameters = {}
+hyperparameter_candidates = {"input_chunk_length": [1, 10, 25], "training_length": [51, 101, 256]}
+hyperparameters = cross_validate_hyperparameters(model_name, traj_train, hyperparameters, hyperparameter_candidates, gpu_params)
+run_forecast_benchmark(
+    model_name, traj_train, hyperparameters,
     forecast_length, gpu_params, equation_name, dirname=dirname
 )
 
