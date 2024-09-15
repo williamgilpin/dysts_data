@@ -15,8 +15,9 @@ large_multivariate__pts_per_period_100__periods_100.json
 *__periods_60*
 *__periods_100*
 all_outputs.json*
+development.ipynb
 zero_shot_plotting.ipynb
-fig_resources
+benchmark_results/fig_resources
 
 # Old files
 archive/
