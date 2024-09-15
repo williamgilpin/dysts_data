@@ -64,26 +64,6 @@ class ChronosModel:
                 the number of dimensions.
                 
         """
-        # if self.autoregressive:
-        #     forecast_agg = []
-        #     current_context = torch.tensor(data[-self.context:])
-        #     print(int(math.ceil(self.prediction_length / self.max_chunk)), flush=True)
-        #     for i in range(int(math.ceil(self.prediction_length / self.max_chunk))):
-        #         forecast = self.pipeline.predict(
-        #             context=torch.tensor(current_context),
-        #             prediction_length=self.max_chunk,
-        #             num_samples=self.n_samples,
-        #         )
-        #         mean_forecast = forecast.mean(dim=1)
-        #         current_context = torch.cat((current_context, mean_forecast), dim=1)[:, -self.context:]
-        #         forecast_agg.append(forecast)
-        #     forecast = torch.cat(forecast_agg, dim=2)[:self.prediction_length]
-        # else:
-        #     forecast = self.pipeline.predict(
-        #         context=torch.tensor(data[-self.context:]),
-        #         prediction_length=self.prediction_length,
-        #         num_samples=self.n_samples,
-        #     )
         forecast = self.pipeline.predict(
             context=torch.tensor(data[-self.context:]),
             prediction_length=self.prediction_length,

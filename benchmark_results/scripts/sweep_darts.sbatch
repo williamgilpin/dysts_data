@@ -1,18 +1,18 @@
 #!/bin/bash
 # Job name:
-#SBATCH --job-name=chronos
+#SBATCH --job-name=sweep_darts
 #
 # Account:
 #SBATCH --account=PHY22025
 #
 # Pick partition:
-#SBATCH --partition=normal
+#SBATCH --partition=gpu-a100-small
 #
 # Job progress file
-#SBATCH --output=chronos.out
+#SBATCH --output=sweep_darts.out
 #
 # Error file:
-#SBATCH --error=chronos.err      
+#SBATCH --error=sweep_darts.err      
 #
 # Request one node:
 #SBATCH --nodes=1
@@ -27,8 +27,9 @@
 #SBATCH --cpus-per-task=1
 #
 # Wall clock limit: HH:MM:SS 12 hr
-#SBATCH --time=12:00:00
+#SBATCH --time=04:00:00
 #
 source /work/08962/wgilpin/ls6/miniforge3/bin/activate
 mamba activate dysts_benchmarks
-python chronos_benchmarks.py "$1" "${2:-30}"
+python sweep_darts.py "$1"
+

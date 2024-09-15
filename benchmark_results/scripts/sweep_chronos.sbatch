@@ -1,6 +1,6 @@
 #!/bin/bash
 # Job name:
-#SBATCH --job-name=chronos
+#SBATCH --job-name=sweep_chronos
 #
 # Account:
 #SBATCH --account=PHY22025
@@ -31,4 +31,5 @@
 #
 source /work/08962/wgilpin/ls6/miniforge3/bin/activate
 mamba activate dysts_benchmarks
-python chronos_benchmarks.py "$1" "${2:-30}"
+python sweep_chronos.py "$1" "${2:-30}"
+

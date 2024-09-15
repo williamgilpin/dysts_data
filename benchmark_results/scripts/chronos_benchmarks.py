@@ -76,8 +76,7 @@ np.save(save_str_reference, traj_test_forecast, allow_pickle=True)
 from models import ChronosModel
 
 ## Run chronos zero-shot benchmark
-#for model_size in ["tiny", "mini", "small", "base", "large"]:
-for model_size in ["large"]:
+for model_size in ["tiny", "mini", "small", "base", "large"]:
     model = ChronosModel(model=model_size, context=context_length, n_samples=n_average, 
                                         prediction_length=forecast_length)
     print(model_size, flush=True)
