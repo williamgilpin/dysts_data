@@ -14,10 +14,12 @@ test_multivariate__pts_per_period_100__periods_60.json*
 large_multivariate__pts_per_period_100__periods_100.json
 *__periods_60*
 *__periods_100*
+all_outputs_long_forecasting.json.gz
 all_outputs.json*
 development.ipynb
 zero_shot_plotting.ipynb
 benchmark_results/fig_resources
+*.ckpt
 
 # Old files
 archive/
