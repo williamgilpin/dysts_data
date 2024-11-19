@@ -73,6 +73,10 @@ save_str_reference = f"forecast_{eq.name}_granularity{pts_per_period}_true_chron
 save_str_reference = os.path.join(dirname, save_str_reference)
 np.save(save_str_reference, traj_test_forecast, allow_pickle=True)
 
+save_str_reference2 = f"context_{eq.name}_granularity{pts_per_period}_true_chronos_context"
+save_str_reference2 = os.path.join(dirname, save_str_reference2)
+np.save(save_str_reference2, traj_test_context, allow_pickle=True)
+
 from models import ChronosModel
 
 ## Run chronos zero-shot benchmark

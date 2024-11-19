@@ -79,8 +79,8 @@ def vpt_smape(x, xhat, threshold=30):
     Find the first time index at which an array exceeds a threshold.
 
     Args:
-        arr (np.ndarray): The array to search. The first dimension should be a horizoned
-            smape series.
+        x (np.ndarray): The ground truth, a time series of shape (nt, 1).
+        xhat (np.ndarray): The forecast, a time series of shape (nt, 1).
         threshold (float): The threshold to search for.
 
     Returns:

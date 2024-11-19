@@ -4,7 +4,7 @@ import math
 
 class ChronosModel:
     """
-    A wrapper around the Chronos forecase model class that makes it easier to use in 
+    A wrapper around the Chronos forecase model that makes it easier to use in 
     forecasting tasks.
 
     Attributes:
