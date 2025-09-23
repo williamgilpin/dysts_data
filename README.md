@@ -1,21 +1,18 @@
-This secondary data repository hosts precomputed time series datasets and benchmark results for our main repository, [dysts](https://github.com/williamgilpin/dysts)
-
-```bash
-    pip install dysts[data]
-```
+This secondary data repository hosts precomputed time series datasets and benchmark results for our main repository, [dysts](https://github.com/williamgilpin/dysts).
 
 ## Installation
+Clone the repository and install:
 
-The key dependencies are
+```bash
+git clone https://github.com/williamgilpin/dysts_data.git
+cd dysts_data
+pip install -e .
+```
 
-+ Python 3+
-+ numpy
-+ scipy
-+ pandas
-+ sdeint (optional, but required for stochastic dynamics)
-+ numba (optional, but speeds up generation of trajectories)
-+ darts (used for forecasting benchmarks)
-+ sktime (used for classification benchmarks)
-+ tsfresh (used for statistical quantity extraction)
-+ pytorch (used for neural network benchmarks)
-+ sympy (used for equation analysis benchmarks)
+
+## Usage
+```python
+from dysts_data.datasets import load_dataset
+data = load_dataset(subsets="train", data_format="numpy", standardize=True)
+```
+
